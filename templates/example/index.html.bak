@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            //CSRF code
+            function getCookie(name) {
+                var cookieValue = null;
+                var i = 0;
+                if (document.cookie && document.cookie !=='') {
+                    var cookies = document.cookie.split(';');
+                    for (i; i < cookies.length; i++) {
+                        var cookie =jQuery.trim(cookies[i]);
+                        if (cookie.substr(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue
+            }
+
+            var csrftoken = getCookie('csrftoken');
+
+            function csrfSafeMethod(method) {
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+
+            $.ajaxSetup(
+                {
+                    crossDomain: false,
+                    beforeSend: function (xhr, settings) {
+                        if (!csrfSafeMethod(settings.type)) {
+                            xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                        }
+
+                    }
+                }
+            );
+        });
+
+        $('.get-more').click(function () {
+            $.ajax({
+               type: "get",
+               url: "/ajax/more/",
+               dataType: "json",
+               success: function (data) {
+                   json_str = JSON.stringify(data);
+                   json_data = JSON.parse(json_str);
+                   for (var i in json_data){
+                       item = json_data[i];
+                       $('ul').append('<li>'+ item.poem_id + " " + item.author + "</li>")
+                   }
+               }
+            });
+        });
+    </script>
+    <meta charset="UTF-8">
+    <title>主页</title>
+</head>
+<body>
+<div class="container">
+    <div class="container">
+        <h3>诗书:</h3>
+        <ul>
+            <li>结果：</li>
+        </ul>
+        <button class="button get-more">更多诗书</button>
+    </div>
+</div>
+</body>
+</html>
